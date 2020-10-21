@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, uic
+from PyQt5.QtWidgets import QMessageBox
 from libs.client_lib import Client
 
 
@@ -22,12 +23,18 @@ class Window(QtWidgets.QMainWindow):
 
     def set_server(self):
         self.__host = self.__set_win.server_ip.text()
-        self.__port = self.__set_win.server_port.text()
+        self.__port = int(self.__set_win.server_port.text())
         self.__win.server_settings.setText(f'Сервер: {self.__host}:{self.__port}')
         self.__client = Client(self.__host, self.__port)
         self.__set_win.close()
 
     def send(self):
+        if self.__win.message.text() == '':
+            QMessageBox.information(self, 'Ошибка!', "Введите текст сообщения!")
+            return None
+        if self.__client is None:
+            QMessageBox.information(self, 'Ошибка!', "Введите параметры сервера!")
+            return None
         self.__client.work(self.__win.message.text())
         self.__win.chat.setText(self.__win.chat.text() + self.__client.get_resp())
         self.__win.chat.adjustSize()
